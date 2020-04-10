@@ -18,14 +18,18 @@ COMMANDS_en = {
 from enum import Enum
 
 class Messages_en(Enum):
-    start = "Hello, welcome to the game that's you.\n\nTo create a new game use the /new command.\nIf you want to configure the game go to /config.\nAny questions access the command /help."
+    START = "Hello, welcome to the game that's you.\n\nTo create a new game use the /new command.\nIf you want to configure the game go to /config.\nAny questions access the command /help."
 
-    no_start =  "To start the bot you must be in a group. Create a group and start the bot in a group using the /start command."
+    NO_START_GROUP =  "To start the bot you must be in a group. Create a group and start the bot in a group using the /start command. You will only vote here"
 
-    new = "Hello! Let's start a new game, follow the instructions below.\n\n- Each person who wants to play must send the /join command to be added to the game.\n- When everyone sends their commands, the /init command must be sent to start the game.\nAny questions about the commands click on /help to see the list of available commands."
+    NO_START = "You need to use the /start command to start the group."
 
-    unkown = "Sorry, I didn't understand that command. \nClick on /help and look at the list of valid commands."
+    NEW = "Hello! Let's start a new game, follow the instructions below.\n\n- Each person who wants to play must send the /join command to be added to the game.\n- When everyone sends their commands, the /init command must be sent to start the game.\nAny questions about the commands click on /help to see the list of available commands."
 
-    help_msg = "Hello, I'm here to help you.\n\nThe commands below are available for use:\n"
+    UNKOWN = "Sorry, I didn't understand that command. \nClick on /help and look at the list of valid commands."
+
+    HELP = "Hello, I'm here to help you.\n\nThe commands below are available for use:\n"
+
+
 
 

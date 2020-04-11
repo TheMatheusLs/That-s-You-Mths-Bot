@@ -1,5 +1,5 @@
 from collections import Counter
-from settings import QUESTION_FILE
+from settings import QUESTION_FILE, POINTS_INCREMENT
 import random
 
 class ThatsYouGame():
@@ -25,6 +25,7 @@ class ThatsYouGame():
         except:
             raise FileNotFoundError('The question file does not exist.')
     
+
     def create_scoreboard(self) -> None:
         """Starts the match score
         """
@@ -32,6 +33,7 @@ class ThatsYouGame():
             self.scoreboard.update({player.name: {}})
             self.scoreboard[player.name].update({'points': 0})
         
+
     def show_scoreboard(self)-> str:
         """Apresenta o placar
         
@@ -45,6 +47,7 @@ class ThatsYouGame():
 
         return scoreboard_msg
     
+
     def get_question(self) -> str:
         """Random question
         
@@ -55,3 +58,65 @@ class ThatsYouGame():
         self.questions.remove(question)
         
         return question
+    
+
+    def check_vote(self, user, vote: str) -> bool:
+        """Checks whether the vote is valid
+        
+        Arguments:
+            user {[type]} -- Who voted?
+            vote {str} -- Who was voted on?
+        
+        Returns:
+            bool -- Valid vote?
+        """
+        if user in self.players and vote in self.players_name:
+            return True
+        return False
+    
+
+    def show_votes(self) -> str:
+        """Show votes
+        
+        Returns:
+            str -- Votes
+        """
+        return ''.join([f'{name} -> {vote}\n' for name, vote in self.votes.items()])
+
+
+    def show_winner_round(self) -> str:
+        """Show winners
+        
+        Returns:
+            str -- Winners
+        """
+        return '\n'.join(self.round_winner())
+    
+
+    def round_winner(self) -> list:
+        """Checks the winner of the round
+        
+        Returns:
+            list -- Winners
+        """
+        winner: list = list()
+
+        for name, count in Counter(self.votes.values()).items():
+            if count == max(Counter(self.votes.values()).values()):
+                for key, value in self.votes.items():
+                    if value == name:
+                        winner.append(key)
+        return winner
+    
+
+    def clear_votes(self) -> None:
+        """Clear votes
+        """
+        self.votes = {}
+    
+
+    def update_score(self) -> None:
+        """[summary]
+        """
+        for winner in self.round_winner():    
+            self.scoreboard[winner]['points'] += POINTS_INCREMENT

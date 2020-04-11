@@ -20,6 +20,8 @@ if __name__ == '__main__':
     updater.dispatcher.add_handler(CommandHandler('new', commands.new_game))
     updater.dispatcher.add_handler(CommandHandler('join', commands.join_game))
     updater.dispatcher.add_handler(CommandHandler('init', commands.init_game))
+    updater.dispatcher.add_handler(CommandHandler('menu', commands.show_menu))
+    updater.dispatcher.add_handler(CommandHandler('vote', commands.vote))
     updater.dispatcher.add_handler(CommandHandler('help', commands.show_help))
     updater.dispatcher.add_handler(MessageHandler(Filters.command, commands.unknown))
 

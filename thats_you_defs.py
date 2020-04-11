@@ -1,6 +1,6 @@
 from settings import COMMANDS_en, Messages_en
 from thats_you_game import ThatsYouGame
-
+from telegram import InlineKeyboardButton, ReplyKeyboardMarkup
 class ThatsYouCommands():
     def __init__(self) -> None:
         self.start_game_flag: bool = False
@@ -125,7 +125,6 @@ class ThatsYouCommands():
         self.show_question(bot, update)
 
 
-
     def join_game(self, bot, update) -> None:
         """Add players to the game
         
@@ -158,8 +157,14 @@ class ThatsYouCommands():
         else:
             update.bot.send_message(chat_id=bot.message.chat_id, text=Messages_en.ALREADY_IN_GAME.value, reply_to_message_id=True)
 
-    def show_question(self, bot, update):
 
+    def show_question(self, bot, update) -> None:
+        """Display a question.
+        
+        Arguments:
+            bot {[type]} -- Update
+            update {[type]} -- CallbackContext
+        """
         if len(self.Game.questions) > 1:
             update.bot.send_message(chat_id=self.group_id, text=Messages_en.ASWER.value + self.Game.get_question())
 
@@ -172,3 +177,92 @@ class ThatsYouCommands():
             # Check Winner
 
             update.bot.send_message(chat_id=self.group_id, text='XXXX' + Messages_en.WINNER.value)
+        
+
+    def show_menu(self, bot, update) -> None:
+        """Display vote menu.
+        
+        Arguments:
+            bot {[type]} -- Update
+            update {[type]} -- CallbackContext
+        
+        """
+        # Checks whether the Bot was started
+        if not self.start_game_flag:
+            update.bot.send_message(chat_id=bot.effective_chat.id, text=Messages_en.NO_START.value)
+            return None
+
+        # Checks whether the game has started
+        if not self.new_game_flag:
+            update.bot.send_message(chat_id=self.group_id, text=Messages_en.NO_NEW_GAME.value)
+            return None
+
+        if bot.effective_chat.type == 'private':
+            if not self.Game.vote_flag:
+                update.bot.send_message(chat_id=bot.effective_chat.id, text=Messages_en.NO_TIME_VOTE.value)
+                return None
+
+            update.bot.send_message(chat_id=bot.effective_chat.id, text=Messages_en.WHO_VOTE.value, reply_markup=self.menu_vote_keyboard())
+        else:
+            update.bot.send_message(chat_id=bot.effective_chat.id, text=Messages_en.MENU_PRIVATE.value)
+
+
+    def menu_vote_keyboard(self) -> None:
+        """Create a vote menu
+        """
+        keyboard_vote = [[InlineKeyboardButton(f'/vote {player.name}')] for player in self.Game.players]
+
+        return ReplyKeyboardMarkup(keyboard_vote)
+    
+    def vote(self, bot, update):
+        # Checks whether the Bot was started
+        if not self.start_game_flag:
+            update.bot.send_message(chat_id=bot.effective_chat.id, text=Messages_en.NO_START.value)
+            return None
+
+        # Checks whether the game has started
+        if not self.new_game_flag:
+            update.bot.send_message(chat_id=self.group_id, text=Messages_en.NO_NEW_GAME.value)
+            return None
+
+        if not self.Game.vote_flag:
+            update.bot.send_message(chat_id=bot.effective_chat.id, text=Messages_en.NO_TIME_VOTE.value)
+            return None
+        
+        if bot.effective_chat.type == 'private':
+            if not self.Game.vote_flag:
+                update.bot.send_message(chat_id=bot.effective_chat.id, text=Messages_en.NO_TIME_VOTE.value)
+                return None
+
+            vote = bot.message.text.replace('/vote ','').strip()
+            user = bot.message.from_user
+            name = user.name
+
+            if name not in self.Game.votes.keys():
+                if self.Game.check_vote(user, vote):
+                    self.Game.votes.update({name: vote})
+                    update.bot.send_message(chat_id=bot.effective_chat.id, text=Messages_en.BACK_TO_GROUP.value)
+                    update.bot.send_message(chat_id=self.group_id, text=name + Messages_en.ALREADY_VOTE.value)
+
+                    if len(self.Game.votes) == len(self.Game.players):
+                        self.Game.vote_flag = False
+                        update.bot.send_message(chat_id=self.group_id, text=Messages_en.SHOW_VOTE.value + self.Game.show_votes())
+
+                        update.bot.send_message(chat_id=self.group_id, text=Messages_en.WINNERS_ROUND.value + self.Game.show_winner_round())
+
+                        self.Game.update_score()
+
+                        update.bot.send_message(chat_id=self.group_id, text=self.Game.show_scoreboard())
+
+                        self.Game.clear_votes()
+
+                        self.show_question(bot, update)
+
+                else:
+                    update.bot.send_message(chat_id=bot.effective_chat.id, text=f'{name}, você digitou um nome inválido, vote novamente.')
+            else:
+                update.bot.send_message(chat_id=bot.effective_chat.id, text=f'{name}, você já votou! Vá para o grupo e aguarde as outras pessoas votarem.')
+            print('Vote')
+        else:
+            update.bot.send_message(chat_id=bot.effective_chat.id, text=Messages_en.MENU_PRIVATE.value)
+

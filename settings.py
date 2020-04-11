@@ -6,6 +6,7 @@ API_TOKEN = 'ADD_HERE'
 QUESTION_FILE = 'questions.txt'
 
 ##################################################  Constants  #################################################################
+POINTS_INCREMENT = 100
 
 # List of commands with a brief description
 COMMANDS_en = {
@@ -14,6 +15,8 @@ COMMANDS_en = {
     '/join': 'Log in to play the match',
     '/init': 'Starts a match',
     '/help': 'Displays the help screen with commands.',
+    '/menu': 'Displays vote menu. Only in private chat.',
+    '/vote': 'Assign a vote.',
 }
 
 ############################################  Messages  ######################################################
@@ -50,6 +53,16 @@ class Messages_en(Enum):
 
     WINNER = " is the winner!!! Congratulations for the victory!"
 
+    MENU_PRIVATE = "This command must be executed in the private chat. Click @ThatsYouMths_bot to vote."
 
+    WHO_VOTE = "Who do you want to vote for?"
 
+    NO_TIME_VOTE = "It is not time to vote. You must wait for a question."
 
+    BACK_TO_GROUP = "Go back to the group and wait!"
+
+    ALREADY_VOTE = " has already voted!"
+
+    SHOW_VOTE = "Everyone has already voted! The votes were:\n"
+
+    WINNERS_ROUND = "The winners of the round were:\n"

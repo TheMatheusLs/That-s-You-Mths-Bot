@@ -1,6 +1,7 @@
 from settings import COMMANDS_en, Messages_en
 from thats_you_game import ThatsYouGame
-from telegram import InlineKeyboardButton, ReplyKeyboardMarkup
+from telegram import InlineKeyboardButton, ReplyKeyboardMarkup, ParseMode
+from time import sleep
 class ThatsYouCommands():
     def __init__(self) -> None:
         self.start_game_flag: bool = False
@@ -120,7 +121,7 @@ class ThatsYouCommands():
 
         self.Game.create_scoreboard()
 
-        update.bot.send_message(chat_id=self.group_id, text=self.Game.show_scoreboard())
+        update.bot.send_message(chat_id=self.group_id, text=self.Game.show_scoreboard(), parse_mode=ParseMode.MARKDOWN_V2)
         
         self.show_question(bot, update)
 
@@ -148,10 +149,10 @@ class ThatsYouCommands():
         
         # Collect the user who sent the command
         user = bot.message.from_user
-        user_name:str = user.name
+        user_name:str = user.first_name + ' ' + user.last_name
 
         if user not in self.Game.players:
-            update.bot.send_message(chat_id=self.group_id, text=user_name + Messages_en.WAS_ADD.value)
+            update.bot.send_message(chat_id=self.group_id, text='*' + user_name + '*' + Messages_en.WAS_ADD.value, parse_mode=ParseMode.MARKDOWN_V2)
             self.Game.players.add(user)
             self.Game.players_name.append(user_name)
         else:
@@ -165,18 +166,18 @@ class ThatsYouCommands():
             bot {[type]} -- Update
             update {[type]} -- CallbackContext
         """
-        if len(self.Game.questions) > 1:
-            update.bot.send_message(chat_id=self.group_id, text=Messages_en.ASWER.value + self.Game.get_question())
+        if len(self.Game.questions) > 2:
+            update.bot.send_message(chat_id=self.group_id, text=Messages_en.ASWER.value + '*' + self.Game.get_question() + '*', parse_mode=ParseMode.MARKDOWN_V2)
 
             self.Game.vote_flag = True
 
             update.bot.send_message(chat_id=self.group_id, text=Messages_en.PRIVATE_VOTE.value)
         else:
-            update.bot.send_message(chat_id=self.group_id, text=Messages_en.GAME_OVER.value)
+            update.bot.send_message(chat_id=self.group_id, text='*' + Messages_en.GAME_OVER.value + '*', parse_mode=ParseMode.MARKDOWN_V2)
             self.new_game_flag = False
-            # Check Winner
 
-            update.bot.send_message(chat_id=self.group_id, text='XXXX' + Messages_en.WINNER.value)
+            for winner in self.Game.winner():
+                update.bot.send_message(chat_id=self.group_id, text='*' + winner + '*' + Messages_en.WINNER.value, parse_mode=ParseMode.MARKDOWN_V2)
         
 
     def show_menu(self, bot, update) -> None:
@@ -210,8 +211,8 @@ class ThatsYouCommands():
     def menu_vote_keyboard(self) -> None:
         """Create a vote menu
         """
-        keyboard_vote = [[InlineKeyboardButton(f'/vote {player.name}')] for player in self.Game.players]
-
+        keyboard_vote = [[InlineKeyboardButton(f'/vote {player.first_name} {player.last_name}')] for player in self.Game.players]
+     
         return ReplyKeyboardMarkup(keyboard_vote)
     
     def vote(self, bot, update):
@@ -234,35 +235,37 @@ class ThatsYouCommands():
                 update.bot.send_message(chat_id=bot.effective_chat.id, text=Messages_en.NO_TIME_VOTE.value)
                 return None
 
-            vote = bot.message.text.replace('/vote ','').strip()
+            vote = bot.message.text.replace('/vote ','')
             user = bot.message.from_user
-            name = user.name
+            name = user.first_name + ' ' + user.last_name
 
             if name not in self.Game.votes.keys():
                 if self.Game.check_vote(user, vote):
                     self.Game.votes.update({name: vote})
                     update.bot.send_message(chat_id=bot.effective_chat.id, text=Messages_en.BACK_TO_GROUP.value)
-                    update.bot.send_message(chat_id=self.group_id, text=name + Messages_en.ALREADY_VOTE.value)
+                    update.bot.send_message(chat_id=self.group_id, text='*' + name + '*' + Messages_en.ALREADY_VOTE.value, parse_mode=ParseMode.MARKDOWN_V2)
 
                     if len(self.Game.votes) == len(self.Game.players):
+                        sleep(2)
                         self.Game.vote_flag = False
-                        update.bot.send_message(chat_id=self.group_id, text=Messages_en.SHOW_VOTE.value + self.Game.show_votes())
+                        update.bot.send_message(chat_id=self.group_id, text=Messages_en.SHOW_VOTE.value + self.Game.show_votes(), parse_mode=ParseMode.MARKDOWN_V2)
 
-                        update.bot.send_message(chat_id=self.group_id, text=Messages_en.WINNERS_ROUND.value + self.Game.show_winner_round())
+                        update.bot.send_message(chat_id=self.group_id, text=Messages_en.WINNERS_ROUND.value +'*' + self.Game.show_winner_round() + '*', parse_mode=ParseMode.MARKDOWN_V2)
 
                         self.Game.update_score()
 
-                        update.bot.send_message(chat_id=self.group_id, text=self.Game.show_scoreboard())
+                        update.bot.send_message(chat_id=self.group_id, text=self.Game.show_scoreboard(), parse_mode=ParseMode.MARKDOWN_V2)
 
                         self.Game.clear_votes()
+
+                        sleep(5)
 
                         self.show_question(bot, update)
 
                 else:
-                    update.bot.send_message(chat_id=bot.effective_chat.id, text=f'{name}, você digitou um nome inválido, vote novamente.')
+                    update.bot.send_message(chat_id=bot.effective_chat.id, text=name + Messages_en.INVALID_NAME.value)
             else:
-                update.bot.send_message(chat_id=bot.effective_chat.id, text=f'{name}, você já votou! Vá para o grupo e aguarde as outras pessoas votarem.')
-            print('Vote')
+                update.bot.send_message(chat_id=bot.effective_chat.id, text=name + Messages_en.YOU_ALREADY_VOTE.value)
         else:
             update.bot.send_message(chat_id=bot.effective_chat.id, text=Messages_en.MENU_PRIVATE.value)
 

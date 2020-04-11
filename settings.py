@@ -43,15 +43,15 @@ class Messages_en(Enum):
 
     ALREADY_IN_GAME = "You're already in the game, take it easy."
 
-    WAS_ADD = " was added to the game."
+    WAS_ADD = " was added to the game\."
 
     ASWER = "Answer the question:\n"
 
     PRIVATE_VOTE = 'Vote for the private chat by clicking @ThatsYouMths_bot. Submit /menu to display the voting options.'
 
-    GAME_OVER = "The game is over!"
+    GAME_OVER = "The game is over\!"
 
-    WINNER = " is the winner!!! Congratulations for the victory!"
+    WINNER = " is the winner\!\!\! Congratulations for the victory\!"
 
     MENU_PRIVATE = "This command must be executed in the private chat. Click @ThatsYouMths_bot to vote."
 
@@ -61,8 +61,12 @@ class Messages_en(Enum):
 
     BACK_TO_GROUP = "Go back to the group and wait!"
 
-    ALREADY_VOTE = " has already voted!"
+    ALREADY_VOTE = " has already voted\!"
 
-    SHOW_VOTE = "Everyone has already voted! The votes were:\n"
+    YOU_ALREADY_VOTE = ", you have already voted! Go to the group and wait for the other people to vote."
+
+    SHOW_VOTE = "Everyone has already voted\! The votes were\:\n"
 
     WINNERS_ROUND = "The winners of the round were:\n"
+
+    INVALID_NAME = ", you entered an invalid name, vote again."

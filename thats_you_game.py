@@ -30,8 +30,9 @@ class ThatsYouGame():
         """Starts the match score
         """
         for player in self.players:
-            self.scoreboard.update({player.name: {}})
-            self.scoreboard[player.name].update({'points': 0})
+            player_name = player.first_name + ' ' + player.last_name
+            self.scoreboard.update({player_name: {}})
+            self.scoreboard[player_name].update({'points': 0})
         
 
     def show_scoreboard(self)-> str:
@@ -40,10 +41,14 @@ class ThatsYouGame():
         Returns:
             str -- Placar
         """
-        scoreboard_msg: str = f"{'Placar':^25}\n" + '-'*35 + '\n'
+        size_name = 14
+        size_points = 6
+
+        scoreboard_msg: str = f"`|{'SCOREBOARD':^{size_name + size_points + 1}}|`\n"
+        scoreboard_msg += f"`|{'NAME':<{size_name}}|{'POINTS':>{size_points}}|`\n"
 
         for name, values in self.scoreboard.items():
-            scoreboard_msg += f"{name:^20}|{values['points']:>8}\n"
+            scoreboard_msg += f"*`|{name:<{size_name}}|{values['points']:>{size_points}}|`*\n"                    
 
         return scoreboard_msg
     
@@ -81,7 +86,7 @@ class ThatsYouGame():
         Returns:
             str -- Votes
         """
-        return ''.join([f'{name} -> {vote}\n' for name, vote in self.votes.items()])
+        return ''.join([f'{index}\. *{value[0]}* voted for *{value[1]}*\.\n' for index, value in enumerate(self.votes.items())])
 
 
     def show_winner_round(self) -> str:
@@ -108,6 +113,15 @@ class ThatsYouGame():
                         winner.append(key)
         return winner
     
+
+    def winner(self) -> list:
+
+        winner: list = list()
+
+        for name, points in self.scoreboard.items():
+            if points['points'] == max([points['points'] for points in self.scoreboard.values()]):
+                winner.append(name)
+        return winner
 
     def clear_votes(self) -> None:
         """Clear votes

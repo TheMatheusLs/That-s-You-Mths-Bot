@@ -11,6 +11,8 @@ QUESTION_FILE = 'questions.txt'
 COMMANDS_en = {
     '/start': 'Start the Bot',
     '/new': 'Creates a new game',
+    '/join': 'Log in to play the match',
+    '/init': 'Starts a match',
     '/help': 'Displays the help screen with commands.',
 }
 
@@ -29,6 +31,24 @@ class Messages_en(Enum):
     UNKOWN = "Sorry, I didn't understand that command. \nClick on /help and look at the list of valid commands."
 
     HELP = "Hello, I'm here to help you.\n\nThe commands below are available for use:\n"
+
+    QUESTION_FILE_ERR = "The question file was not found. Check the server."
+
+    NO_ENOUGH_PLAYERS = "Not enough players to play, it takes 3 people for a game to start."
+
+    NO_NEW_GAME = "You must start a new game first. Use the /new command."
+
+    ALREADY_IN_GAME = "You're already in the game, take it easy."
+
+    WAS_ADD = " was added to the game."
+
+    ASWER = "Answer the question:\n"
+
+    PRIVATE_VOTE = 'Vote for the private chat by clicking @ThatsYouMths_bot. Submit /menu to display the voting options.'
+
+    GAME_OVER = "The game is over!"
+
+    WINNER = " is the winner!!! Congratulations for the victory!"
 
 
 
